@@ -1,65 +1,87 @@
 @import "tailwindcss";
-@tailwind utilities;
 
 @theme {
-  --no-black-lighter: #2f2729;
-  --no-black: #1e191a;
-  --no-gray: #8f8981;
-  --no-white: #e6e3df;
-  --bare-white: #f4f3f2;
-  --radioactive: #aedb33;
-  --radioactive-light: #cfe874;
-  --taffy: #fb82c4;
+  /* Photocopy palette: paper + ink, with riso-style spot colors */
+  --color-ink: #141112;
+  --color-ink-soft: #2f2729;
+  --color-paper: #ece8df;
+  --color-paper-light: #f6f3ec;
+  --color-smudge: #8f8981;
+  --color-radioactive: #aedb33;
+  --color-radioactive-light: #cfe874;
+  --color-taffy: #fb82c4;
+
+  --font-display: "Ultra", "Georgia", serif;
+  --font-condensed: "Anton", "Impact", sans-serif;
+  --font-mono: "Courier Prime", "Courier New", monospace;
+  --font-hand: "Permanent Marker", "Comic Sans MS", cursive;
+
+  --shadow-hard: 5px 5px 0 0 var(--color-ink);
+  --shadow-hard-lg: 9px 9px 0 0 var(--color-ink);
+  --shadow-hard-paper: 5px 5px 0 0 var(--color-paper);
+
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-marquee-reverse: marquee 44s linear infinite reverse;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 @layer base {
-  html,
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 4.5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
   body {
-    @apply bg-[var(--no-black)] text-[var(--no-white)];
-    background-image: url("../assets/dark-tire.png");
-  }
-  #root {
-    @apply flex flex-col items-center justify-center;
+    @apply bg-ink text-paper font-mono antialiased;
   }
 
-  h1 {
-    font-family: "Londrina Solid", sans-serif;
-    @apply leading-[85%] font-normal uppercase;
+  ::selection {
+    @apply bg-radioactive text-ink;
   }
 
+  :focus-visible {
+    @apply outline-3 outline-offset-2 outline-taffy;
+  }
+
+  h1,
   h2 {
-    font-family: "Barlow Condensed", sans-serif;
-    @apply font-bold uppercase text-5xl;
+    @apply font-display font-normal uppercase leading-[0.9];
+  }
+
+  h3 {
+    @apply font-condensed font-normal uppercase tracking-wide;
   }
 
   p {
-    font-family: "Roboto Mono", monospace;
-    @apply font-normal leading-4 lg:leading-6 text-sm lg:text-base;
-  }
-
-  button {
-    font-family: "Anton", sans-serif;
-    @apply font-normal uppercase text-base lg:text-lg;
-  }
-
-  .chip {
-    font-family: "Anton", sans-serif;
-    @apply font-normal uppercase text-base lg:text-lg;
+    @apply text-base leading-relaxed;
   }
 }
 
 @layer utilities {
-  @media (prefers-reduced-motion: no-preference) {
-    .fade-in {
-      opacity: 0;
-      animation: fade-in ease-in forwards;
-      animation-timeline: view();
-      animation-range: entry 0% cover 40vh;
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .fade-in {
+        animation: fade-in ease-out both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 60%;
+      }
     }
   }
   @keyframes fade-in {
-    100% {
-      opacity: 1;
+    from {
+      opacity: 0;
+      translate: 0 2rem;
     }
   }
 }
