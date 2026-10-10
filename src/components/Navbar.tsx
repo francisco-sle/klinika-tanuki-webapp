@@ -1,13 +1,27 @@
 import { Hamburger } from "../assets/icons/Hamburger";
+import { Close } from "../assets/icons/Close";
 import { useState, useRef, useEffect } from "react";
+import tanukiSticker from "../assets/images/zine/tanuki-sticker.webp";
+
+const navLinks = [
+  { href: "#eventos", label: "Eventos" },
+  { href: "#bazar-shop", label: "Bazar" },
+  { href: "#stickers", label: "Stickers" },
+  { href: "#plushies", label: "Peluches" },
+  { href: "#keychains", label: "Llaveros" },
+  { href: "#art", label: "Arte" },
+  { href: "#services", label: "Servicios" },
+  { href: "#sacrificio-barbarico", label: "Sacrificio Barbárico" },
+  { href: "#contact", label: "Contacto" },
+];
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLElement>(null);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (!isMenuOpen && !hamburgerRef) return;
+    if (!isMenuOpen) return;
     const handleClickOutside = (event: MouseEvent) => {
       if (
         menuRef.current &&
@@ -20,7 +34,10 @@ export const Navbar = () => {
     };
 
     const handleKey = (ev: KeyboardEvent) => {
-      if (ev.key === "Escape") setIsMenuOpen(false);
+      if (ev.key === "Escape") {
+        setIsMenuOpen(false);
+        hamburgerRef.current?.focus();
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -31,63 +48,55 @@ export const Navbar = () => {
     };
   }, [isMenuOpen]);
 
-  const navLinks = [
-    { href: "#bazar-shop", label: "Bazar" },
-    { href: "#stickers", label: "Stickers" },
-    { href: "#services", label: "Servicios" },
-    { href: "#plushies", label: "Peluches" },
-    { href: "#keychains", label: "Llaveros" },
-    { href: "#art", label: "Arte" },
-    { href: "#sacrificio-barbarico", label: "Sacrificio Barbárico" },
-    { href: "#contact", label: "Contacto" },
-  ];
-
   return (
-    <header>
-      <nav className="main-nav">
-        <a href="/" className="logo">
-          KT colectivo
+    <header className="site-header">
+      <nav className="main-nav" aria-label="Principal">
+        <a href="#top" className="logo">
+          <img src={tanukiSticker} alt="" />
+          <span>
+            Klinika Tanuki
+            <small>colectivo</small>
+          </span>
         </a>
 
-        {/* Desktop links: hidden on small screens, visible on lg and above */}
-        <ul className="items-center hidden gap-8 lg:flex">
+        <ul className="desktop-links">
           {navLinks.map((l) => (
             <li key={l.href}>
-              <a href={l.href}>
-                <p>{l.label}</p>
-              </a>
+              <a href={l.href}>{l.label}</a>
             </li>
           ))}
         </ul>
 
-        {/* Hamburger: visible on small screens only */}
         <button
           ref={hamburgerRef}
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="menu-button lg:hidden"
+          className="menu-button"
           aria-expanded={isMenuOpen}
-          aria-label="Toggle menu"
+          aria-controls="mobile-menu"
         >
-          <Hamburger />
+          {isMenuOpen ? <Close /> : <Hamburger />}
+          {isMenuOpen ? "Cerrar" : "Menú"}
         </button>
       </nav>
 
-      {/* Mobile menu (keeps original behavior) */}
       <nav
+        id="mobile-menu"
         ref={menuRef}
+        aria-label="Menú móvil"
         className={`mobile-menu ${
-          isMenuOpen ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0"
+          isMenuOpen ? "visible scale-y-100 opacity-100" : "invisible scale-y-0 opacity-0"
         }`}
       >
-        <ul className="menu-list">
-          {navLinks.map((l) => (
+        <ol>
+          {navLinks.map((l, i) => (
             <li key={l.href}>
               <a href={l.href} onClick={() => setIsMenuOpen(false)}>
+                <span>{String(i + 1).padStart(2, "0")}</span>
                 {l.label}
               </a>
             </li>
           ))}
-        </ul>
+        </ol>
       </nav>
     </header>
   );

@@ -3,25 +3,20 @@ import { XMarkIcon } from "@heroicons/react/16/solid";
 
 export const Banner = () => {
   const [isOpen, setIsOpen] = useState(true);
+  if (!isOpen) return null;
+
   return (
-    <div
-      className={`${
-        isOpen ? "" : "hidden "
-      }bg-[var(--radioactive-light)] p-1 text-[var(--no-black)] w-full grid items-center [grid-template-columns:auto_minmax(0,1fr)_auto]`}
-    >
-      <div />
-      <p className="col-start-2 text-center">
-        Nuestra página aún está en desarrollo
+    <div className="caution-banner w-full" role="status">
+      <p>
+        Página en construcción
+        <span className="hidden sm:inline">
+          {" "}
+          · nuestra página aún está en desarrollo
+        </span>
       </p>
-      <div className="flex justify-end col-start-3">
-        <button
-          aria-label="Cerrar banner"
-          onClick={() => setIsOpen(false)}
-          className="rounded hover:text-[var(--radioactive-light)] hover:bg-[var(--no-black)]"
-        >
-          <XMarkIcon className="w-6 h-6" />
-        </button>
-      </div>
+      <button aria-label="Cerrar aviso" onClick={() => setIsOpen(false)}>
+        <XMarkIcon className="size-5" />
+      </button>
     </div>
   );
 };

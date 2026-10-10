@@ -1,307 +1,880 @@
-@reference "tailwindcss";
+@reference "./styles/tailwind.css";
 
-.wrapper {
-  @apply max-w-[1400px] w-full;
+/* ------------------------------------------------------------------ */
+/* Textures                                                            */
+/* ------------------------------------------------------------------ */
+
+:root {
+  /* photocopier toner specks, dark on paper */
+  --grain-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .08 0 0 0 0 .07 0 0 0 0 .07 .9 0 0 0 -.38'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* light dust on black */
+  --grain-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .93 0 0 0 0 .91 0 0 0 0 .87 .7 0 0 0 -.33'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* worn rubber-stamp ink */
+  --stamp-wear: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3 0 0 0 2.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* ripped paper edge */
+  --torn-edge: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 16' preserveAspectRatio='none'%3E%3Cpath d='M0 16V9l6-5 8 7 7-9 9 8 7-5 9 8 8-11 8 7 8-4 9 8 7-8 9 6 7-7 8 8 6-4 4 1V16z'/%3E%3C/svg%3E");
 }
-.content-container {
-  @apply w-full  gap-4 lg:gap-6 place-items-stretch;
-  @apply columns-1 lg:columns-2; /* Masonry columns */
 
-  > article {
-    @apply mb-3 lg:mb-6 break-inside-avoid mx-auto; /* Center articles in columns */
+/* ------------------------------------------------------------------ */
+/* Sections: alternating paper / ink spreads                           */
+/* ------------------------------------------------------------------ */
+
+.zine-section {
+  @apply relative w-full;
+  overflow-x: clip;
+}
+
+.zine-paper {
+  @apply bg-paper text-ink;
+  background-image: var(--grain-dark);
+}
+
+.zine-ink {
+  @apply bg-ink text-paper;
+  background-image: var(--grain-light);
+}
+
+.zine-green {
+  @apply bg-radioactive text-ink;
+  background-image: var(--grain-dark);
+}
+
+.zine-pink {
+  @apply bg-taffy text-ink;
+  background-image: var(--grain-dark);
+}
+
+/* Each section rips over the one above it */
+.torn-top::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: -15px;
+  height: 16px;
+  background-color: inherit;
+  mask: var(--torn-edge) repeat-x 0 0 / 120px 16px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.zine-inner {
+  @apply mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-10;
+}
+
+/* Hairline index rows, like a printed spread header */
+.meta-row {
+  @apply flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-y border-current py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.18em] sm:text-xs;
+}
+
+.section-title {
+  @apply text-5xl sm:text-6xl lg:text-8xl;
+}
+
+.section-kicker {
+  @apply font-hand text-xl sm:text-2xl;
+}
+
+/* ------------------------------------------------------------------ */
+/* Little zine objects: tape, stamps, labels, stickers                 */
+/* ------------------------------------------------------------------ */
+
+.tape {
+  @apply relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -0.85rem;
+    left: 50%;
+    width: 6.5rem;
+    height: 1.7rem;
+    translate: -50% 0;
+    rotate: var(--tape-angle, -4deg);
+    background: var(--tape-color, color-mix(in srgb, var(--color-radioactive) 78%, transparent));
+    clip-path: polygon(
+      0 8%, 4% 0, 8% 10%, 12% 2%, 88% 0, 92% 9%, 96% 1%, 100% 10%,
+      100% 92%, 96% 100%, 92% 90%, 88% 99%, 12% 100%, 8% 91%, 4% 100%, 0 90%
+    );
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  &.tape-pink {
+    --tape-color: color-mix(in srgb, var(--color-taffy) 80%, transparent);
+  }
+  &.tape-paper {
+    --tape-color: color-mix(in srgb, var(--color-paper-light) 72%, transparent);
+  }
+  &.tape-right {
+    --tape-angle: 5deg;
   }
 }
 
-.white-card {
-  @apply text-[var(--no-black)] bg-[var(--no-white)] max-w-lg w-full px-3 lg:px-8 lg:py-8 pt-2 pb-8 rounded-md space-y-3 lg:space-y-6;
+.stamp {
+  @apply inline-block border-[3px] border-current px-3 py-1 font-condensed text-lg uppercase leading-none tracking-wider;
+  rotate: var(--stamp-angle, -5deg);
+  mask: var(--stamp-wear) 0 0 / 160px 160px;
+}
 
-  .image-container {
-    @apply flex flex-row gap-3 justify-start mb-4;
-    img {
-      @apply aspect-square object-cover bg-[var(--no-black)] rounded-md select-none;
-    }
+/* Embossed label-maker tape */
+.dymo {
+  @apply inline-block rounded-[3px] bg-ink px-2.5 py-1 font-mono text-[0.8rem] font-bold uppercase tracking-[0.14em] text-paper-light;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
+    inset 0 -1px 0 rgb(0 0 0 / 0.5);
+  text-shadow: 0 -1px 0 rgb(0 0 0 / 0.6);
+}
 
-    .first-image {
-      @apply w-3/9;
-    }
-    .second-image {
-      @apply w-4/9;
-    }
+.page-ink .dymo,
+.zine-ink .dymo {
+  @apply bg-paper-light text-ink;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.6);
+}
+
+.dymo-list {
+  @apply flex flex-wrap gap-2;
+}
+
+.tag {
+  @apply inline-block border-2 border-current px-3 py-1 font-condensed text-base uppercase leading-tight tracking-wide;
+}
+
+/* ------------------------------------------------------------------ */
+/* Buttons                                                             */
+/* ------------------------------------------------------------------ */
+
+.btn {
+  @apply inline-flex min-h-12 items-center justify-center gap-2 border-2 border-ink px-5 py-2.5 font-condensed text-lg uppercase tracking-wide text-ink shadow-hard transition-[translate,box-shadow,background-color] duration-150 select-none;
+
+  svg {
+    @apply size-5 shrink-0 fill-current;
   }
-}
 
-.chip-container {
-  @apply flex flex-row gap-2 items-center justify-start flex-wrap;
-}
-.chip {
-  @apply w-fit px-4 py-2 rounded-full uppercase border-2;
-}
-
-.description {
-  @apply w-4/5;
-}
-
-.outline-card {
-  @apply text-[var(--radioactive)] max-w-lg w-full px-4 py-4 lg:px-8 lg:py-8 rounded-md space-y-3 lg:space-y-6 border-2;
-
-  .sticker-container {
-    @apply grid grid-cols-3 grid-rows-2 gap-2 justify-items-center items-center;
-    > :first-child {
-      @apply col-span-3;
-    }
-  }
-}
-
-.content-link {
-  @apply bg-[var(--radioactive)] text-[var(--no-black)] h-10 flex gap-2 rounded-md px-4 w-full;
   &:hover {
-    @apply underline;
+    @apply -translate-x-0.5 -translate-y-0.5 shadow-hard-lg;
   }
-
-  a {
-    @apply w-full h-full flex items-center justify-center;
-  }
-}
-
-.radioactive-card {
-  @apply text-[var(--no-black)] max-w-lg bg-[var(--radioactive-light)] lg:space-y-6 lg:px-8 lg:py-8 w-full px-4 pt-3 pb-4 rounded-md space-y-6;
-}
-
-.service {
-  @apply space-y-3;
-}
-
-.image-container-even {
-  @apply grid grid-cols-2 gap-3;
-
-  img {
-    @apply object-cover bg-[var(--no-black)] rounded-md select-none;
+  &:active {
+    @apply translate-x-1 translate-y-1 shadow-none;
   }
 }
 
-.keychain-container {
-  @apply grid grid-cols-2 gap-6 place-items-center;
+.btn-ink {
+  @apply bg-ink text-paper;
+}
+.btn-green {
+  @apply bg-radioactive;
+}
+.btn-pink {
+  @apply bg-taffy;
+}
+.btn-paper {
+  @apply bg-paper-light;
+}
 
-  .keychain-card {
-    @apply flex flex-col items-center justify-center gap-3;
+/* Buttons sitting on black need a paper-colored drop shadow */
+.page-ink .btn,
+.zine-ink .btn {
+  @apply border-paper shadow-hard-paper;
+  &:hover {
+    box-shadow: 9px 9px 0 0 var(--color-paper);
   }
-
-  > :last-child {
-    @apply col-span-2;
+  &:active {
+    box-shadow: none;
   }
 }
 
-.dark-scheme {
-  @apply bg-[var(--no-black)] text-[var(--no-white)];
-}
+.text-link {
+  @apply inline-flex items-center gap-1 font-condensed text-lg uppercase tracking-wide underline decoration-2 underline-offset-4 hover:decoration-wavy;
 
-.pink-card {
-  @apply bg-[var(--taffy)] text-[var(--no-black)] max-w-lg lg:space-y-6 lg:px-8 lg:py-8 w-full px-4 pt-3 pb-4 rounded-md space-y-6;
-}
-
-.art-gallery-container {
-  @apply grid grid-cols-2 grid-rows-2 gap-3;
-
-  > :first-child {
-    @apply row-span-2 h-full;
-  }
-  img {
-    @apply object-cover bg-[var(--bare-white)] rounded-md select-none;
+  svg {
+    @apply size-4;
   }
 }
 
-.sacrificio-card {
-  @apply bg-[var(--no-white)] text-[var(--no-white)] max-w-lg w-full rounded-md overflow-hidden;
+/* ------------------------------------------------------------------ */
+/* Header + banner                                                     */
+/* ------------------------------------------------------------------ */
 
-  .header-image-container {
-    @apply flex justify-center;
-    img {
-      @apply object-cover bg-[var(--no-black)] select-none aspect-16/9;
-    }
-  }
+.caution-banner {
+  @apply relative flex items-center justify-center gap-3 bg-taffy px-10 py-1.5 text-ink;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--color-ink) 0 10px,
+    var(--color-radioactive) 10px 20px
+  );
 
-  .sacrificio-content {
-    @apply p-4 text-[var(--no-black)] lg:space-y-6 lg:px-8 lg:py-8 flex flex-col justify-center items-center px-4 pt-3 pb-4 gap-y-6;
-
-    p {
-      @apply text-center;
-    }
-  }
-
-  iframe {
-    @apply w-3/4 aspect-video;
-  }
-
-  h2 {
-    @apply w-full text-3xl;
-  }
-}
-
-.sb-container {
-  @apply flex flex-col gap-1.5 w-full;
-
-  .merch-list {
-    @apply grid grid-cols-2 gap-y-4 gap-x-2;
-
-    .merch-item {
-      @apply text-center space-y-1.5;
-      .merch-badge {
-        @apply text-[var(--no-gray)];
-      }
-      img {
-        @apply aspect-square object-contain bg-[var(--bare-white)] p-4;
-      }
-    }
-  }
-}
-
-.event-list {
-  @apply flex flex-row gap-2 overflow-x-auto;
-
-  img {
-    @apply aspect-9/16 w-1/3 object-cover bg-[var(--bare-white)] select-none;
-  }
-}
-
-.social-links {
-  @apply flex flex-row gap-2;
-
-  a {
-    @apply text-[var(--no-black)] bg-[var(--no-black)] p-3 hover:bg-[var(--radioactive-light)] transition-colors;
-    svg {
-      @apply w-6 h-6 fill-[var(--no-white)];
-    }
-  }
-}
-
-footer {
-  @apply text-[var(--no-white)] text-center p-4;
-
-  img {
-    @apply aspect-square object-contain w-24 mx-auto mb-2;
-  }
-  .footer-text {
-    @apply text-sm;
-  }
-}
-
-header {
-  @apply w-full bg-[var(--no-black)] top-0 text-[var(--no-white)] sticky z-50 h-16;
-}
-.main-nav {
-  @apply px-4 w-full h-full  flex items-center justify-between bg-[var(--no-black)] text-[var(--no-white)];
-
-  .logo {
-    font-family: "Londrina Solid", sans-serif;
-    @apply text-2xl font-bold uppercase;
+  p {
+    @apply bg-taffy px-2 font-condensed text-sm uppercase tracking-wider sm:text-base;
   }
 
   button {
-    @apply p-2 hover:bg-[var(--radioactive-light)] transition-colors cursor-pointer;
+    @apply absolute right-1.5 grid size-7 cursor-pointer place-items-center bg-ink text-paper transition-colors hover:bg-taffy hover:text-ink;
+  }
+}
+
+.site-header {
+  @apply sticky top-0 z-50 w-full border-b-2 border-paper/15 bg-ink text-paper;
+}
+
+.main-nav {
+  @apply mx-auto flex h-16 w-full max-w-[1400px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-10;
+
+  .logo {
+    @apply flex items-center gap-2;
+
+    img {
+      @apply h-11 w-auto -rotate-6 transition-transform duration-300;
+    }
+    &:hover img {
+      @apply rotate-6 scale-110;
+    }
+    span {
+      @apply font-display text-xl uppercase leading-none;
+    }
+    small {
+      @apply block font-hand text-xs normal-case text-radioactive;
+    }
   }
 
-  svg {
-    @apply w-8 h-8 fill-[var(--radioactive)];
+  .desktop-links {
+    @apply hidden items-center gap-1 xl:flex;
+
+    a {
+      @apply relative px-2.5 py-1 font-condensed text-[0.95rem] uppercase tracking-wide transition-colors;
+
+      &:hover {
+        @apply bg-radioactive text-ink;
+      }
+    }
+  }
+
+  .menu-button {
+    @apply flex cursor-pointer items-center gap-2 border-2 border-paper px-3 py-1.5 font-condensed uppercase tracking-wide transition-colors hover:bg-radioactive hover:text-ink xl:hidden;
+
+    svg {
+      @apply size-5 fill-current;
+    }
   }
 }
 
 .mobile-menu {
-  @apply absolute w-full right-0 lg:w-md text-[var(--no-black)] z-50 transition-all;
+  @apply absolute inset-x-0 top-full origin-top border-b-4 border-radioactive bg-ink transition-[opacity,scale,visibility] duration-200 xl:hidden;
+  background-image: var(--grain-light);
+  max-height: calc(100dvh - 4rem);
+  overflow-y: auto;
 
-  .menu-list {
-    @apply rounded-md flex flex-col items-end justify-center gap-4 p-4 bg-[var(--radioactive-light)];
-    li {
-      @apply text-3xl font-bold uppercase;
-      font-family: "Barlow Condensed", sans-serif;
+  ol {
+    @apply mx-auto flex max-w-[1400px] flex-col px-4 py-4 sm:px-6;
+  }
+
+  li {
+    @apply border-b border-paper/15 last:border-b-0;
+  }
+
+  a {
+    @apply flex items-baseline gap-4 py-2.5 font-display text-3xl uppercase leading-none transition-colors hover:text-radioactive sm:text-4xl;
+
+    span {
+      @apply font-mono text-sm text-taffy;
     }
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Hero                                                                */
+/* ------------------------------------------------------------------ */
+
+.hero {
+  @apply pt-5 pb-16 lg:pt-8 lg:pb-24;
 }
 
 .hero-title {
-  @apply text-8xl  lg:text-9xl uppercase;
+  @apply relative z-10 mt-6 font-display uppercase leading-[0.86] tracking-tight;
+  font-size: clamp(3.4rem, 17vw, 15rem);
+
+  span {
+    @apply block;
+  }
+  .indent {
+    @apply pl-[0.35em];
+  }
 }
 
-.hero-content {
-  @apply relative h-[calc(50vh)] lg:max-h-[50rem] w-full rounded-md flex flex-col justify-between items-center p-3 overflow-hidden;
-  /* mt-16 */
+.hero-grid {
+  @apply mt-8 grid gap-10 lg:mt-10 lg:grid-cols-12 lg:gap-8;
 }
 
-.hero-content::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("./assets/images/hero.webp") center 40% / cover no-repeat;
-
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    rgba(22, 19, 20, 1) 0%,
-    transparent 80%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    rgba(22, 19, 20, 1) 0%,
-    transparent 80%,
-    transparent 100%
-  );
-  mask-mode: alpha;
-  z-index: 0;
+.hero-copy {
+  @apply flex flex-col gap-6 lg:col-span-6 lg:pt-6;
 }
 
-.hero-content > * {
-  z-index: 1;
+.hero-tagline {
+  @apply w-fit -rotate-2 bg-radioactive px-3 py-1 font-hand text-xl leading-snug text-ink sm:text-2xl;
+  box-shadow: var(--shadow-hard);
 }
 
-.hero-instagram-link {
-  @apply w-fit right-4 bg-[var(--taffy)] p-3 rounded-full flex self-start items-center gap-2;
+.hero-collage {
+  @apply relative mx-auto w-[88%] max-w-md sm:w-full lg:col-span-6 lg:-mt-28 lg:mr-0 lg:max-w-[34rem];
+
+  .photo {
+    @apply relative rotate-2 border-2 border-ink bg-paper-light p-2 pb-8;
+    box-shadow: var(--shadow-hard-lg);
+
+    img {
+      @apply aspect-square w-full object-cover;
+    }
+    figcaption {
+      @apply absolute right-3 bottom-2 font-mono text-[0.7rem] uppercase tracking-[0.2em];
+    }
+  }
+
+  .mascot {
+    @apply absolute -bottom-10 -left-6 w-40 -rotate-12 drop-shadow-[3px_4px_0_rgb(20_17_18_/_0.35)] sm:-left-12 sm:w-52;
+  }
+
+  .burst {
+    @apply absolute -top-8 -right-3 w-32 sm:-right-8 sm:w-36;
+  }
+}
+
+.category-links {
+  @apply flex flex-wrap gap-2;
+
+  a {
+    @apply border-2 border-ink bg-paper-light px-3 py-1 font-condensed uppercase tracking-wide transition-[background-color,rotate] duration-150;
+
+    &:nth-child(3n + 1):hover {
+      @apply -rotate-3 bg-radioactive;
+    }
+    &:nth-child(3n + 2):hover {
+      @apply rotate-2 bg-taffy;
+    }
+    &:nth-child(3n):hover {
+      @apply -rotate-1 bg-ink text-paper;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Starburst badge                                                     */
+/* ------------------------------------------------------------------ */
+
+.starburst {
+  @apply relative grid aspect-square place-items-center;
+
   svg {
-    @apply w-6 h-6 fill-[var(--no-black)];
+    @apply absolute inset-0 size-full;
   }
-  &:hover {
-    @apply underline;
+  span {
+    @apply relative max-w-[70%] text-center font-condensed text-lg uppercase leading-[1.05] tracking-wide;
   }
 }
 
-.upcoming-events-container {
-  @apply flex flex-col gap-3 p-4;
+/* ------------------------------------------------------------------ */
+/* Marquee ribbons (crossing tape)                                     */
+/* ------------------------------------------------------------------ */
 
-  .event-title-container {
-    @apply flex items-center gap-1.5;
+.ribbons {
+  @apply relative z-10 h-36 sm:h-44;
+  overflow-x: clip;
+  background: linear-gradient(to bottom, var(--color-paper) 50%, var(--color-ink) 50%);
+}
+
+.ribbon {
+  @apply absolute inset-x-[-5%] flex overflow-hidden border-y-2 border-ink py-2 text-ink;
+  top: 50%;
+
+  &.ribbon-green {
+    @apply bg-radioactive;
+    translate: 0 -95%;
+    rotate: -3deg;
+  }
+  &.ribbon-pink {
+    @apply bg-taffy;
+    translate: 0 10%;
+    rotate: 2.5deg;
+  }
+}
+
+.ribbon-track {
+  @apply flex w-max shrink-0 animate-marquee;
+
+  .ribbon-pink & {
+    @apply animate-marquee-reverse;
+  }
+
+  span {
+    @apply flex items-center gap-5 pr-5 font-condensed text-xl uppercase tracking-wider whitespace-nowrap sm:text-2xl;
+  }
+  i {
+    @apply font-display not-italic;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ribbon-track {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Events                                                              */
+/* ------------------------------------------------------------------ */
+
+.events {
+  @apply pt-20 pb-16 lg:pt-24 lg:pb-20;
+}
+
+.events-head {
+  @apply flex flex-wrap items-end justify-between gap-4;
+
+  .section-title {
+    @apply text-radioactive;
+  }
+}
+
+.event-list {
+  @apply mt-8 flex flex-col;
+}
+
+.event-row {
+  @apply grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-3 border-t-2 border-paper/20 py-5 sm:grid-cols-[auto_1fr_auto] sm:gap-x-6;
+
+  &:last-child {
+    @apply border-b-2;
+  }
+
+  .date-block {
+    @apply grid w-20 place-items-center bg-radioactive py-2 text-ink sm:w-24;
+    box-shadow: var(--shadow-hard-paper);
+
+    b {
+      @apply font-display text-4xl leading-none font-normal sm:text-5xl;
+    }
+    span {
+      @apply font-condensed text-sm uppercase tracking-wider;
+    }
+  }
+
+  h3 {
+    @apply text-2xl leading-tight sm:text-3xl;
+  }
+
+  .when {
+    @apply font-mono text-sm text-paper/75 first-letter:uppercase sm:text-base;
+  }
+
+  .event-actions {
+    @apply col-span-2 flex flex-wrap items-center gap-3 sm:col-span-1 sm:justify-end;
+  }
+
+  &.is-past {
+    .date-block {
+      @apply bg-smudge;
+      box-shadow: none;
+    }
+    h3 {
+      @apply text-paper/60 line-through decoration-taffy decoration-[3px];
+    }
+  }
+}
+
+.live-pill {
+  @apply inline-flex items-center gap-2 bg-taffy px-3 py-1 font-condensed uppercase tracking-wide text-ink;
+
+  &::before {
+    content: "";
+    @apply size-2.5 rounded-full bg-ink;
+    animation: blink 1s steps(2, start) infinite;
+  }
+}
+
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+.events-empty {
+  @apply mt-8 grid gap-6 border-2 border-dashed border-paper/40 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-8;
+
+  p {
+    @apply max-w-xl text-lg;
+  }
+}
+
+.archive-label {
+  @apply mt-12 mb-1 font-condensed text-sm uppercase tracking-[0.25em] text-paper/60;
+}
+
+/* ------------------------------------------------------------------ */
+/* Catalog: each product is a zine page                                */
+/* ------------------------------------------------------------------ */
+
+.catalog {
+  @apply pt-20 pb-20 lg:pt-24 lg:pb-28;
+}
+
+.catalog-grid {
+  @apply mt-12 columns-1 gap-8 md:columns-2 xl:columns-3;
+}
+
+.page {
+  @apply relative mb-10 flex break-inside-avoid flex-col gap-5 border-2 border-ink bg-paper-light p-5 text-ink sm:p-6;
+  box-shadow: var(--shadow-hard-lg);
+
+  &.page-ink {
+    @apply bg-ink text-paper;
+    background-image: var(--grain-light);
+  }
+  &.page-pink {
+    @apply bg-taffy;
+  }
+  &.page-green {
+    @apply bg-radioactive;
+  }
+
+  @media (min-width: 768px) {
+    &:nth-child(odd) {
+      rotate: -0.6deg;
+    }
+    &:nth-child(even) {
+      rotate: 0.5deg;
+    }
+  }
+
+  .page-head {
+    @apply flex flex-col gap-2;
+  }
+
+  .page-num {
+    @apply flex items-center justify-between border-b border-current pb-1.5 font-mono text-xs uppercase tracking-[0.2em];
+  }
+
+  h2 {
+    @apply text-5xl leading-[0.95] sm:text-6xl;
+  }
+
+  .blurb {
+    @apply text-[0.95rem] leading-relaxed;
+  }
+
+  .page-foot {
+    @apply flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-t border-current/40 pt-4;
+  }
+}
+
+/* Loose note pasted at the end of the catalog */
+.catalog-note {
+  @apply relative mb-10 flex break-inside-avoid flex-col items-start gap-4 border-2 border-dashed border-ink bg-paper-light/60 p-6;
+
+  h3 {
+    @apply font-hand text-3xl normal-case tracking-normal;
+  }
+}
+
+/* Taped photo frame */
+.snap {
+  @apply relative border-2 border-ink bg-paper-light p-1.5;
+
+  img {
+    @apply size-full object-cover select-none;
+  }
+
+  figcaption {
+    @apply pt-1.5 text-center font-mono text-xs uppercase tracking-[0.15em] text-ink;
+  }
+}
+
+.photo-pair {
+  @apply mt-3 grid grid-cols-[2fr_3fr] items-end gap-3;
+
+  .snap:first-child {
+    @apply -rotate-2;
+  }
+  .snap:last-child {
+    @apply rotate-1;
+  }
+  img {
+    @apply aspect-[3/4];
+  }
+}
+
+.photo-even {
+  @apply mt-3 grid grid-cols-2 gap-3;
+
+  .snap:first-child {
+    @apply -rotate-2;
+  }
+  .snap:last-child {
+    @apply rotate-2;
+  }
+  img {
+    @apply aspect-[3/4];
+  }
+}
+
+.sticker-sheet {
+  @apply grid grid-cols-3 items-center justify-items-center gap-3 rounded-sm border-2 border-dashed border-paper/40 p-3;
+
+  img {
+    @apply max-h-28 w-full object-contain transition-transform duration-200 select-none hover:scale-110 hover:-rotate-6;
+    filter: drop-shadow(2px 3px 0 rgb(0 0 0 / 0.5));
+  }
+
+  > :first-child {
+    @apply col-span-3 max-h-none;
+  }
+}
+
+.keychain-grid {
+  @apply mt-3 grid grid-cols-2 gap-4;
+
+  .snap {
+    @apply bg-ink;
+  }
+  .snap figcaption {
+    @apply text-paper;
+  }
+  .snap:nth-child(1) {
+    @apply -rotate-2;
+  }
+  .snap:nth-child(2) {
+    @apply rotate-2;
+  }
+  .snap:nth-child(3) {
+    @apply col-span-2 mx-auto w-4/5 -rotate-1;
+  }
+  img {
+    @apply aspect-square object-contain;
+  }
+  .snap:nth-child(3) img {
+    @apply aspect-[974/600];
+  }
+}
+
+.art-gallery {
+  @apply mt-3 grid grid-cols-2 grid-rows-2 gap-3;
+
+  .snap:first-child {
+    @apply row-span-2 -rotate-1;
+
+    img {
+      @apply h-full;
+    }
+  }
+  .snap:nth-child(2) {
+    @apply rotate-2;
+  }
+  .snap:nth-child(3) {
+    @apply -rotate-2;
+  }
+  .snap:not(:first-child) img {
+    @apply aspect-square;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Services                                                            */
+/* ------------------------------------------------------------------ */
+
+.services {
+  @apply pt-20 pb-20 lg:pt-24 lg:pb-24;
+}
+
+.services-layout {
+  @apply grid gap-10 lg:grid-cols-12 lg:gap-12;
+
+  > header {
+    @apply flex flex-col items-start gap-6 lg:col-span-5;
+
+    .section-title {
+      @apply lg:text-6xl xl:text-7xl;
+    }
+  }
+}
+
+.service-list {
+  @apply flex flex-col lg:col-span-7;
+
+  li {
+    @apply grid grid-cols-[4.25rem_1fr] items-start gap-x-4 gap-y-1 border-t-2 sm:grid-cols-[7rem_1fr] sm:gap-x-6 border-ink py-6 last:border-b-2;
+  }
+
+  .num {
+    @apply row-span-2 font-display text-5xl leading-none text-transparent sm:text-7xl;
+    -webkit-text-stroke: 2px var(--color-ink);
+  }
+
+  h3 {
+    @apply text-3xl leading-none sm:text-4xl;
+  }
+
+  p {
+    @apply max-w-md;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Sacrificio Barbárico: gig flyer spread                              */
+/* ------------------------------------------------------------------ */
+
+.band {
+  @apply pt-20 pb-20 lg:pt-24 lg:pb-24;
+}
+
+.band-title {
+  @apply mt-6 font-display uppercase leading-[0.85];
+  font-size: clamp(2.9rem, 11.5vw, 10rem);
+
+  span {
+    @apply block;
+  }
+  .outline {
+    @apply text-transparent;
+    -webkit-text-stroke: 2px var(--color-paper);
+  }
+}
+
+.band-intro {
+  @apply mt-6 flex flex-wrap items-center gap-4;
+
+  .stamp {
+    @apply text-taffy;
+  }
+}
+
+.band-grid {
+  @apply mt-10 grid gap-10 lg:grid-cols-2 lg:gap-12;
+}
+
+.band-photo {
+  @apply relative border-2 border-paper/70;
+
+  img {
+    @apply aspect-[900/528] w-full object-cover;
+  }
+}
+
+.video-frame {
+  @apply relative border-2 border-paper bg-black;
+  box-shadow: 8px 8px 0 0 var(--color-taffy);
+
+  iframe {
+    @apply aspect-video w-full;
+  }
+}
+
+.band-block {
+  @apply flex flex-col gap-4;
+
+  h3 {
+    @apply flex items-center gap-3 text-3xl;
+
+    &::after {
+      content: "";
+      @apply h-0.5 flex-1 bg-paper/30;
+    }
+  }
+}
+
+.merch-grid {
+  @apply grid grid-cols-2 gap-4;
+
+  figure {
+    @apply flex flex-col border-2 border-paper bg-paper-light text-ink;
+  }
+  img {
+    @apply aspect-square w-full object-contain p-3 select-none;
+  }
+  figcaption {
+    @apply flex flex-1 flex-col gap-0.5 border-t-2 border-ink px-2.5 py-2;
+
+    b {
+      @apply font-condensed text-xs font-normal uppercase tracking-[0.2em] text-smudge;
+    }
+    span {
+      @apply font-condensed text-base uppercase leading-tight sm:text-lg;
+    }
+  }
+}
+
+.flyer-wall {
+  @apply -mx-4 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pt-4 pb-6 sm:-mx-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0;
+  scrollbar-color: var(--color-taffy) transparent;
+
+  figure {
+    @apply w-[62%] shrink-0 snap-center border-2 border-paper/80 sm:w-[38%] lg:w-auto;
+
+    &:nth-child(odd) {
+      @apply -rotate-2;
+    }
+    &:nth-child(even) {
+      @apply rotate-1;
+    }
+  }
+
+  img {
+    @apply aspect-[3/4] w-full object-cover select-none;
+  }
+}
+
+.social-links {
+  @apply flex flex-wrap gap-3;
+
+  a {
+    @apply grid size-14 place-items-center border-2 border-paper bg-ink transition-[background-color,translate] hover:-translate-y-1 hover:bg-radioactive;
 
     svg {
-      @apply w-6 h-6 stroke-[var(--radioactive)];
+      @apply size-6 fill-paper;
     }
-    h2 {
-      @apply text-4xl font-bold uppercase text-[var(--radioactive)];
-    }
-  }
-
-  .event-list {
-    @apply flex flex-col gap-0;
-    h3 {
-      @apply text-3xl uppercase font-bold leading-7;
-      font-family: "Barlow Condensed", sans-serif;
-    }
-
-    h4 {
-      @apply font-normal text-3xl;
-      font-family: "Barlow Condensed", sans-serif;
+    &:hover svg {
+      @apply fill-ink;
     }
   }
 }
 
-.categories-container {
-  @apply flex flex-row gap-2 items-center justify-start flex-wrap text-[var(--no-black)] p-4;
+/* ------------------------------------------------------------------ */
+/* Contact + footer                                                    */
+/* ------------------------------------------------------------------ */
 
-  .category-chip {
-    font-family: "Anton", sans-serif;
-    @apply uppercase px-3 py-2 rounded-md leading-4;
-    &:hover {
-      @apply bg-[var(--radioactive-light)] cursor-pointer;
-    }
+.contact {
+  @apply pt-20 pb-20 lg:pt-24 lg:pb-24;
+}
+
+.contact-layout {
+  @apply grid items-center gap-10 lg:grid-cols-12;
+
+  .copy {
+    @apply flex flex-col items-start gap-6 lg:col-span-8;
+  }
+
+  .contact-title {
+    @apply font-display uppercase leading-[0.88];
+    font-size: clamp(2.6rem, 8vw, 7rem);
+  }
+
+  .mascot {
+    @apply mx-auto w-56 rotate-6 drop-shadow-[6px_6px_0_rgb(20_17_18)] sm:w-72 lg:col-span-4;
   }
 }
 
-.capitalized-content::first-letter {
-  text-transform: capitalize;
+.site-footer {
+  @apply pt-14 pb-10;
+
+  .zine-inner {
+    @apply flex flex-col items-center gap-6 text-center;
+  }
+
+  img {
+    @apply w-24 -rotate-6;
+  }
+
+  .footer-meta {
+    @apply w-full;
+  }
+
+  p {
+    @apply text-sm text-paper/70;
+  }
 }
