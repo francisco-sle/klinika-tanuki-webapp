@@ -46,6 +46,7 @@ dayjs.extend(localizedFormat);
 dayjs.extend(updateLocale);
 dayjs.locale("es");
 
+const SITE_URL = "https://klinikatanuki.com/";
 const INSTAGRAM_URL = "https://www.instagram.com/klinika_tanuki/";
 const SB_FACEBOOK_URL = "https://www.facebook.com/SACRIFICIOBARBARICOPV";
 
@@ -53,6 +54,8 @@ interface ZineEvent {
   id: string;
   name: string;
   url?: string;
+  /** Venue name and address; defaults to Ensenada when omitted. */
+  location?: string;
   startDate: Dayjs;
   endDate: Dayjs;
 }
@@ -69,6 +72,13 @@ const events: ZineEvent[] = [
   },
 ];
 
+const flyers = [
+  { src: sbEvent3, width: 1006, height: 1280 },
+  { src: sbEvent2, width: 655, height: 1095 },
+  { src: sbEvent1, width: 1440, height: 1919 },
+  { src: sbEvent4, width: 638, height: 799 },
+];
+
 const categories = [
   { label: "Bazar", href: "#bazar-shop" },
   { label: "Arte", href: "#art" },
@@ -78,6 +88,45 @@ const categories = [
   { label: "Artesanías", href: "#plushies" },
   { label: "Sacrificio Barbárico", href: "#sacrificio-barbarico" },
 ];
+
+// Event times are local to Ensenada; keep them offset-free so the output
+// doesn't depend on the timezone of the machine that renders it.
+const LOCAL_DATETIME = "YYYY-MM-DDTHH:mm:ss";
+
+const EventsJsonLd = ({ events }: { events: ZineEvent[] }) => {
+  const data = events.map((event) => ({
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: event.name,
+    startDate: event.startDate.format(LOCAL_DATETIME),
+    endDate: event.endDate.format(LOCAL_DATETIME),
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    location: {
+      "@type": "Place",
+      name: event.location ?? "Ensenada, Baja California",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Ensenada",
+        addressRegion: "Baja California",
+        addressCountry: "MX",
+      },
+    },
+    image: `${SITE_URL}og-image.jpg`,
+    description: `Encuentra a Klinika Tanuki en ${event.name}: bazar, stickers, peluches, llaveros y arte.`,
+    url: event.url ?? `${SITE_URL}#eventos`,
+  }));
+
+  return (
+    <script
+      type="application/ld+json"
+      // Escape "<" so event names can never close the script tag.
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(data).replace(/</g, "\\u003c"),
+      }}
+    />
+  );
+};
 
 const getStatus = (event: ZineEvent, now: Dayjs): EventStatus => {
   if (now.isAfter(event.endDate)) return "past";
@@ -116,7 +165,7 @@ const EventRow = ({ event, now }: { event: ZineEvent; now: Dayjs }) => {
 
   return (
     <li className={`event-row ${status === "past" ? "is-past" : ""}`}>
-      <time className="date-block" dateTime={event.startDate.toISOString()}>
+      <time className="date-block" dateTime={event.startDate.format(LOCAL_DATETIME)}>
         <b>{event.startDate.format("D")}</b>
         <span>{event.startDate.format("MMM YY").replace(".", "")}</span>
       </time>
@@ -166,7 +215,7 @@ function App() {
             </div>
 
             <h1 className="hero-title">
-              <span>Klinika</span>
+              <span>Klinika</span>{" "}
               <span className="indent">Tanuki</span>
             </h1>
 
@@ -211,11 +260,14 @@ function App() {
                 <figure className="photo tape tape-pink">
                   <img
                     src={heroHalftone}
+                    width={900}
+                    height={900}
+                    fetchPriority="high"
                     alt="Sticker de Klinika Tanuki: un tanuki con el lema Centro de Reinserción Social de Objetos"
                   />
                   <figcaption>Fig. 1 — Sticker oficial</figcaption>
                 </figure>
-                <img className="mascot" src={tanukiSticker} alt="" />
+                <img className="mascot" src={tanukiSticker} width={960} height={735} alt="" />
                 <Starburst className="burst">Hecho a mano</Starburst>
               </div>
             </div>
@@ -260,6 +312,7 @@ function App() {
               </p>
             </div>
 
+            {upcoming.length > 0 && <EventsJsonLd events={upcoming} />}
             {upcoming.length > 0 ? (
               <ol className="event-list">
                 {upcoming.map((event) => (
@@ -322,10 +375,10 @@ function App() {
                 </header>
                 <div className="photo-pair">
                   <figure className="snap tape">
-                    <img src={kewpie} alt="Muñeca Kewpie vintage" />
+                    <img src={kewpie} width={1237} height={1649} loading="lazy" decoding="async" alt="Muñeca Kewpie vintage" />
                   </figure>
                   <figure className="snap tape tape-pink tape-right">
-                    <img src={alice} alt="Muñeca de porcelana con bufanda verde" />
+                    <img src={alice} width={1237} height={1237} loading="lazy" decoding="async" alt="Muñeca de porcelana con bufanda verde" />
                   </figure>
                 </div>
                 <p className="blurb">
@@ -351,10 +404,10 @@ function App() {
                   <h2 className="text-radioactive">Stickers</h2>
                 </header>
                 <div className="sticker-sheet">
-                  <img src={theBeatles} alt="Stickers de The Beatles estilo chibi" />
-                  <img src={kemonitoKuromi} alt="Sticker de Kuromi" />
-                  <img src={alienCat} alt="Sticker de gato alien verde" />
-                  <img src={axolotl} alt="Sticker de ajolote rosa" />
+                  <img src={theBeatles} width={1635} height={600} loading="lazy" decoding="async" alt="Stickers de The Beatles estilo chibi" />
+                  <img src={kemonitoKuromi} width={600} height={640} loading="lazy" decoding="async" alt="Sticker de Kuromi" />
+                  <img src={alienCat} width={600} height={678} loading="lazy" decoding="async" alt="Sticker de gato alien verde" />
+                  <img src={axolotl} width={600} height={553} loading="lazy" decoding="async" alt="Sticker de ajolote rosa" />
                 </div>
                 <p className="blurb">
                   Diseños propios, impresos y suajados por el colectivo.
@@ -380,10 +433,10 @@ function App() {
                 </header>
                 <div className="photo-even">
                   <figure className="snap tape tape-paper">
-                    <img src={plushieBrown} alt="Peluche de osito café con moño" />
+                    <img src={plushieBrown} width={600} height={800} loading="lazy" decoding="async" alt="Peluche de osito café con moño" />
                   </figure>
                   <figure className="snap tape tape-right">
-                    <img src={plushieGreen} alt="Peluche llavero de alien verde" />
+                    <img src={plushieGreen} width={600} height={800} loading="lazy" decoding="async" alt="Peluche llavero de alien verde" />
                   </figure>
                 </div>
                 <p className="blurb">Peluches y peluches-llavero hechos a mano.</p>
@@ -405,15 +458,15 @@ function App() {
                 </header>
                 <div className="keychain-grid">
                   <figure className="snap tape">
-                    <img src={keychainFront} alt="Llavero de acrílico, vista frontal" />
+                    <img src={keychainFront} width={600} height={585} loading="lazy" decoding="async" alt="Llavero de acrílico, vista frontal" />
                     <figcaption>Frontal</figcaption>
                   </figure>
                   <figure className="snap tape tape-pink tape-right">
-                    <img src={keychainBack} alt="Llavero de acrílico, vista trasera" />
+                    <img src={keychainBack} width={600} height={642} loading="lazy" decoding="async" alt="Llavero de acrílico, vista trasera" />
                     <figcaption>Trasera</figcaption>
                   </figure>
                   <figure className="snap tape">
-                    <img src={keychainInside} alt="Llavero de acrílico abierto, vista interior" />
+                    <img src={keychainInside} width={974} height={600} loading="lazy" decoding="async" alt="Llavero de acrílico abierto, vista interior" />
                     <figcaption>Interior</figcaption>
                   </figure>
                 </div>
@@ -437,13 +490,13 @@ function App() {
                 </header>
                 <div className="art-gallery">
                   <figure className="snap tape tape-pink">
-                    <img src={artMalice} alt="Ilustración de chica gótica con vestido azul" />
+                    <img src={artMalice} width={800} height={1633} loading="lazy" decoding="async" alt="Ilustración de chica gótica con vestido azul" />
                   </figure>
                   <figure className="snap tape tape-paper tape-right">
-                    <img src={artChuy} alt="Collage de muñeca con lágrimas rojas" />
+                    <img src={artChuy} width={600} height={600} loading="lazy" decoding="async" alt="Collage de muñeca con lágrimas rojas" />
                   </figure>
                   <figure className="snap">
-                    <img src={artManchild} alt="Ilustración de chica en una tina con cerditos" />
+                    <img src={artManchild} width={800} height={800} loading="lazy" decoding="async" alt="Ilustración de chica en una tina con cerditos" />
                   </figure>
                 </div>
                 <div className="dymo-list">
@@ -533,7 +586,7 @@ function App() {
               <span>Ensenada, B.C.</span>
             </div>
             <h2 className="band-title">
-              <span>Sacrificio</span>
+              <span>Sacrificio</span>{" "}
               <span className="outline">Barbárico</span>
             </h2>
             <div className="band-intro">
@@ -544,7 +597,7 @@ function App() {
             <div className="band-grid">
               <div className="flex flex-col gap-10">
                 <figure className="band-photo tape tape-pink">
-                  <img src={sbHalftone} alt="Integrantes de Sacrificio Barbárico frente a una tienda" />
+                  <img src={sbHalftone} width={900} height={528} loading="lazy" decoding="async" alt="Integrantes de Sacrificio Barbárico frente a una tienda" />
                 </figure>
                 <div className="video-frame">
                   <iframe
@@ -559,16 +612,23 @@ function App() {
                   <h3>Escúchalos</h3>
                   <div className="social-links">
                     <a
+                      aria-label="Sacrificio Barbárico en Instagram"
                       href="https://www.instagram.com/sacrificio.barbaricopv/"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       <Instagram />
                     </a>
-                    <a href={SB_FACEBOOK_URL} target="_blank" rel="noopener noreferrer">
+                    <a
+                      aria-label="Sacrificio Barbárico en Facebook"
+                      href={SB_FACEBOOK_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <Facebook />
                     </a>
                     <a
+                      aria-label="Sacrificio Barbárico en YouTube"
                       href="https://www.youtube.com/@SACRIFICIOBARBARICO"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -576,6 +636,7 @@ function App() {
                       <Youtube />
                     </a>
                     <a
+                      aria-label="Escucha Sin Saber Afinar en Bandcamp"
                       href="https://sacrificiobarbarico.bandcamp.com/album/ep-1-sin-saber-afinar"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -591,28 +652,28 @@ function App() {
                 <h3>Merch</h3>
                 <div className="merch-grid">
                   <figure>
-                    <img src={sbMerch1} alt="Camisa negra de Sacrificio Barbárico, diseño 2025" />
+                    <img src={sbMerch1} width={1000} height={1010} loading="lazy" decoding="async" alt="Camisa negra de Sacrificio Barbárico, diseño 2025" />
                     <figcaption>
                       <b>S.B.</b>
                       <span>Camisa XL Diseño 2025</span>
                     </figcaption>
                   </figure>
                   <figure>
-                    <img src={sbMerch3} alt="Cassette Sin Saber Afinar" />
+                    <img src={sbMerch3} width={1255} height={800} loading="lazy" decoding="async" alt="Cassette Sin Saber Afinar" />
                     <figcaption>
                       <b>S.B.</b>
                       <span>Sin Saber Afinar Cassette 2024</span>
                     </figcaption>
                   </figure>
                   <figure>
-                    <img src={sbMerch2} alt="Camisa negra S.B., diseño 2024" />
+                    <img src={sbMerch2} width={1000} height={909} loading="lazy" decoding="async" alt="Camisa negra S.B., diseño 2024" />
                     <figcaption>
                       <b>S.B.</b>
                       <span>Camisa XL Diseño 2024</span>
                     </figcaption>
                   </figure>
                   <figure>
-                    <img src={sbMerch4} alt="Stickers de Sacrificio Barbárico" />
+                    <img src={sbMerch4} width={1266} height={800} loading="lazy" decoding="async" alt="Stickers de Sacrificio Barbárico" />
                     <figcaption>
                       <b>S.B.</b>
                       <span>Stickers</span>
@@ -634,9 +695,16 @@ function App() {
             <div className="band-block mt-16">
               <h3>Tocadas</h3>
               <div className="flyer-wall" tabIndex={0} aria-label="Flyers de tocadas">
-                {[sbEvent3, sbEvent2, sbEvent1, sbEvent4].map((src, i) => (
+                {flyers.map(({ src, width, height }, i) => (
                   <figure key={src} className="tape tape-paper">
-                    <img src={src} alt={`Flyer de tocada de Sacrificio Barbárico ${i + 1}`} />
+                    <img
+                      src={src}
+                      width={width}
+                      height={height}
+                      loading="lazy"
+                      decoding="async"
+                      alt={`Flyer de tocada de Sacrificio Barbárico ${i + 1}`}
+                    />
                   </figure>
                 ))}
               </div>
@@ -673,7 +741,7 @@ function App() {
                   Escríbenos en Instagram
                 </a>
               </div>
-              <img className="mascot" src={tanukiSticker} alt="" />
+              <img className="mascot" src={tanukiSticker} width={960} height={735} loading="lazy" decoding="async" alt="" />
             </div>
           </div>
         </section>
@@ -681,7 +749,7 @@ function App() {
 
       <footer className="zine-section zine-ink torn-top site-footer">
         <div className="zine-inner">
-          <img src={tanukiSticker} alt="Klinika Tanuki" />
+          <img src={tanukiSticker} width={960} height={735} loading="lazy" decoding="async" alt="Klinika Tanuki" />
           <div className="meta-row footer-meta text-paper/70">
             <span>Klinika Tanuki</span>
             <span>Ensenada, B.C.</span>
