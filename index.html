@@ -1,13 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es-MX">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Klinika Tanuki</title>
+
+    <title>Klinika Tanuki | Colectivo de arte, bazar y música en Ensenada, B.C.</title>
+    <meta
+      name="description"
+      content="Colectivo de artistas independientes de Ensenada, Baja California. Bazar de segunda mano, stickers, peluches, llaveros, arte original, impresión de stickers y diseño gráfico."
+    />
+    <link rel="canonical" href="https://klinikatanuki.com/" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="author" content="Klinika Tanuki" />
+    <meta name="geo.region" content="MX-BCN" />
+    <meta name="geo.placename" content="Ensenada" />
+
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#aedb33" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Klinika Tanuki" />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:url" content="https://klinikatanuki.com/" />
+    <meta property="og:title" content="Klinika Tanuki — Centro de Reinserción Social de Objetos" />
+    <meta
+      property="og:description"
+      content="Colectivo de artistas independientes de Ensenada, B.C. Bazar, stickers, peluches, llaveros, arte, impresión y música."
+    />
+    <meta property="og:image" content="https://klinikatanuki.com/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Klinika Tanuki: tanuki dibujado a mano y sticker del colectivo" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Klinika Tanuki — Centro de Reinserción Social de Objetos" />
+    <meta
+      name="twitter:description"
+      content="Colectivo de artistas independientes de Ensenada, B.C. Bazar, stickers, peluches, llaveros, arte, impresión y música."
+    />
+    <meta name="twitter:image" content="https://klinikatanuki.com/og-image.jpg" />
+    <meta name="twitter:image:alt" content="Klinika Tanuki: tanuki dibujado a mano y sticker del colectivo" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Permanent+Marker&family=Ultra&display=swap"
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://klinikatanuki.com/#organization",
+            "name": "Klinika Tanuki",
+            "url": "https://klinikatanuki.com/",
+            "logo": "https://klinikatanuki.com/icon-512.png",
+            "image": "https://klinikatanuki.com/og-image.jpg",
+            "slogan": "Centro de Reinserción Social de Objetos",
+            "description": "Colectivo de artistas y creadores independientes de Ensenada, Baja California. Bazar de segunda mano, stickers, peluches, llaveros, arte original, diseño gráfico, impresión y desarrollo web.",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Ensenada",
+              "addressRegion": "Baja California",
+              "addressCountry": "MX"
+            },
+            "areaServed": {
+              "@type": "City",
+              "name": "Ensenada, Baja California"
+            },
+            "knowsAbout": [
+              "Bazar de segunda mano",
+              "Stickers",
+              "Peluches hechos a mano",
+              "Llaveros de acrílico",
+              "Ilustración",
+              "Diseño gráfico",
+              "Impresión de stickers",
+              "Desarrollo web"
+            ],
+            "sameAs": ["https://www.instagram.com/klinika_tanuki/"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://klinikatanuki.com/#website",
+            "url": "https://klinikatanuki.com/",
+            "name": "Klinika Tanuki",
+            "inLanguage": "es-MX",
+            "publisher": { "@id": "https://klinikatanuki.com/#organization" }
+          },
+          {
+            "@type": "MusicGroup",
+            "@id": "https://klinikatanuki.com/#sacrificio-barbarico",
+            "name": "Sacrificio Barbárico",
+            "url": "https://klinikatanuki.com/#sacrificio-barbarico",
+            "genre": "Powerviolence",
+            "foundingLocation": {
+              "@type": "Place",
+              "name": "Ensenada, Baja California, México"
+            },
+            "album": {
+              "@type": "MusicAlbum",
+              "name": "Sin Saber Afinar",
+              "url": "https://sacrificiobarbarico.bandcamp.com/album/ep-1-sin-saber-afinar"
+            },
+            "sameAs": [
+              "https://www.instagram.com/sacrificio.barbaricopv/",
+              "https://www.facebook.com/SACRIFICIOBARBARICOPV",
+              "https://www.youtube.com/@SACRIFICIOBARBARICO",
+              "https://sacrificiobarbarico.bandcamp.com/"
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><!--app-html--></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

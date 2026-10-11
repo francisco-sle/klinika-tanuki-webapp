@@ -52,7 +52,7 @@ export const Navbar = () => {
     <header className="site-header">
       <nav className="main-nav" aria-label="Principal">
         <a href="#top" className="logo">
-          <img src={tanukiSticker} alt="" />
+          <img src={tanukiSticker} width={960} height={735} alt="" />
           <span>
             Klinika Tanuki
             <small>colectivo</small>
